@@ -1,14 +1,16 @@
-import dynamic from 'next/dynamic'
-
-const DynamicHeader = dynamic(() => import('../components/Header'), {
-  loading: () => <p>Loading...</p>,
-})
+import Layout from '../components/Layout';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
 
 export default function Home() {
   return (
-    <div>
-      <DynamicHeader />
-      {/* Rest of your page content */}
-    </div>
-  )
+    <Layout>
+      <Header />
+      <main>
+        <h1>Welcome to Velam Safaris</h1>
+        {/* Add more content here */}
+      </main>
+      <Footer />
+    </Layout>
+  );
 }

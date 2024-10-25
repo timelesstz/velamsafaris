@@ -1,6 +1,14 @@
 import Image from 'next/image'
 
-export default function TourCard({ tour }) {
+interface Tour {
+  featuredImage: {
+    sourceUrl: string;
+  };
+  title: string;
+  excerpt: string;
+}
+
+export default function TourCard({ tour }: { tour: Tour }) {
   return (
     <div className="card">
       <Image

@@ -2,7 +2,12 @@ import { GetStaticProps, GetStaticPaths } from 'next'
 import { gql } from '@apollo/client'
 import client from '../../lib/apollo-client'
 
-export default function Tour({ tour }) {
+interface Tour {
+  title: string
+  content: string
+}
+
+export default function Tour({ tour }: { tour: Tour }) {
   return (
     <div>
       <h1>{tour.title}</h1>
@@ -24,7 +29,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
     `,
   })
 
-  const paths = data.tours.nodes.map((tour) => ({
+  const paths = data.tours.nodes.map((tour: { slug: string }) => ({
     params: { slug: tour.slug },
   }))
 
@@ -41,7 +46,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
         }
       }
     `,
-    variables: { slug: params.slug },
+    variables: { slug: params?.slug },
   })
 
   return {
