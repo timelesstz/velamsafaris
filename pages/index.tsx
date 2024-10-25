@@ -1,62 +1,47 @@
 import { gql } from "@apollo/client";
 import client from "../lib/apollo-client";
-import Head from 'next/head';
+import Layout from "../components/Layout";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
 
-interface Post {
-  id: string;
-  title: string;
-  excerpt: string;
-}
-
-interface HomeProps {
-  posts: Post[];
-}
-
-export default function Home({ posts }: HomeProps) {
+export default function Home({ posts, pageData }) {
   return (
-    <div>
-      <Head>
-        <title>Velam Safaris</title>
-        <meta name="description" content="Explore the adventures with Velam Safaris" />
-      </Head>
-      <h1>Velam Safaris</h1>
-      {posts.map((post) => (
-        <div key={post.id}>
-          <h2>{post.title}</h2>
-          <div dangerouslySetInnerHTML={{ __html: post.excerpt }} />
-        </div>
-      ))}
-    </div>
+    <Layout>
+      <Header />
+      <main>
+        <h1>{pageData.title}</h1>
+        <div dangerouslySetInnerHTML={{ __html: pageData.content }} />
+        {/* Add other components as needed to match your current design */}
+      </main>
+      <Footer />
+    </Layout>
   );
 }
 
 export async function getStaticProps() {
-  try {
-    const { data } = await client.query({
-      query: gql`
-        query GetPosts {
-          posts {
-            nodes {
-              id
-              title
-              excerpt
-            }
+  const { data } = await client.query({
+    query: gql`
+      query GetHomePageData {
+        pageBy(uri: "/") {
+          title
+          content
+        }
+        posts(first: 3) {
+          nodes {
+            id
+            title
+            excerpt
           }
         }
-      `,
-    });
+      }
+    `,
+  });
 
-    return {
-      props: {
-        posts: data.posts.nodes,
-      },
-    };
-  } catch (error) {
-    console.error("Error fetching posts:", error);
-    return {
-      props: {
-        posts: [],
-      },
-    };
-  }
+  return {
+    props: {
+      pageData: data.pageBy,
+      posts: data.posts.nodes,
+    },
+    revalidate: 60, // Revalidate every 60 seconds
+  };
 }
