@@ -4,7 +4,16 @@ import Layout from "../components/Layout";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
-export default function Page({ pageData }) {
+interface PageData {
+  title: string;
+  content: string;
+}
+
+interface PageProps {
+  pageData: PageData;
+}
+
+export default function Page({ pageData }: PageProps) {
   return (
     <Layout>
       <Header />
@@ -18,7 +27,7 @@ export default function Page({ pageData }) {
 }
 
 export async function getStaticPaths() {
-  const { data } = await client.query({
+  const { data } = await client.query<{ pages: { nodes: { slug: string }[] } }>({
     query: gql`
       query GetAllPageSlugs {
         pages(first: 100) {
@@ -37,8 +46,8 @@ export async function getStaticPaths() {
   return { paths, fallback: 'blocking' };
 }
 
-export async function getStaticProps({ params }) {
-  const { data } = await client.query({
+export async function getStaticProps({ params }: { params: { slug: string } }) {
+  const { data } = await client.query<{ page: PageData }>({
     query: gql`
       query GetPageData($slug: ID!) {
         page(id: $slug, idType: URI) {
